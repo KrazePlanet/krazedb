@@ -1,6 +1,6 @@
-# BountyCatch Remix 🎯
+# KrazeDb Remix 🎯
 
-A bug bounty domain management tool for security researchers and penetration testers. This repository contains *my remix* of Jason Haddix's  [`bountycatch.py`](https://gist.github.com/jhaddix/91035a01168902e8130a8e1bb383ae1e) script. The original script was simple and easier to manage, and I just added my own twist so it could do other commands I needed 🧸.
+A bug bounty domain management tool for security researchers and penetration testers. This repository contains *my remix* of Jason Haddix's  [`krazedb`](https://gist.github.com/jhaddix/91035a01168902e8130a8e1bb383ae1e) script. The original script was simple and easier to manage, and I just added my own twist so it could do other commands I needed 🧸.
 
 
 *(Note: courtesy of this script goes to Jason Haddix. I just added some features that I wanted there and maintaining the core simplicity ❤️)*
@@ -8,7 +8,7 @@ A bug bounty domain management tool for security researchers and penetration tes
 
 ## Overview
 
-**BountyCatch** is a simple Python application for managing domain lists in bug bounties. It provides domain validation, duplicate detection, multiple export formats, and Redis-backed storage with connection pooling. All domains are stored in a single collection (no per-project flag needed).
+**KrazeDb** is a simple Python application for managing domain lists in bug bounties. It provides domain validation, duplicate detection, multiple export formats, and Redis-backed storage with connection pooling. All domains are stored in a single collection (no per-project flag needed).
 
 ## Features
 
@@ -86,6 +86,19 @@ pip install redis
 pip install -r requirements.txt
 ```
 
+### Installing krazedb
+```
+git clone https://github.com/rix4uni/krazedb.git
+cd krazedb
+python3 setup.py install
+```
+
+## pipx
+Quick setup in isolated python environment using [pipx](https://pypa.github.io/pipx/)
+```
+pipx install --force git+https://github.com/rix4uni/krazedb.git
+```
+
 ## Configuration
 
 ### Default Configuration
@@ -116,7 +129,7 @@ export REDIS_PORT=6380
 
 ### Command Structure
 ```bash
-python3 bountycatch.py [global-options] <command> [command-options]
+krazedb [global-options] <command> [command-options]
 ```
 
 ### Global Options
@@ -129,66 +142,66 @@ python3 bountycatch.py [global-options] <command> [command-options]
 #### **Adding Domains**
 Import domains from a text file with automatic validation:
 ```bash
-python3 bountycatch.py add -f domains.txt
+krazedb add -f domains.txt
 
 # Skip domain validation (not recommended)
-python3 bountycatch.py add -f domains.txt --no-validate
+krazedb add -f domains.txt --no-validate
 ```
 
 #### **Counting Domains**
 Get the total number of domains in the database:
 ```bash
-python3 bountycatch.py count
+krazedb count
 ```
 
 #### **Listing Domains**
 Print all domains in alphabetical order:
 ```bash
-python3 bountycatch.py print
+krazedb print
 ```
 
 #### **Removing Domains**
 Remove domains that were added by mistake:
 ```bash
 # Remove a single domain
-python3 bountycatch.py remove -d unwanted-domain.com
+krazedb remove -d unwanted-domain.com
 
 # Remove multiple domains from a file
-python3 bountycatch.py remove -f domains_to_remove.txt
+krazedb remove -f domains_to_remove.txt
 ```
 
 #### **Exporting Domains**
 Export domains to various formats:
 ```bash
 # Export to text file (default)
-python3 bountycatch.py export -f domains.txt
+krazedb export -f domains.txt
 
 # Export to JSON with metadata
-python3 bountycatch.py export -f domains.json --format json
+krazedb export -f domains.json --format json
 ```
 
 #### **Deleting All Domains**
 Remove all domains from the database:
 ```bash
 # With confirmation prompt
-python3 bountycatch.py delete-all
+krazedb delete-all
 
 # Skip confirmation (use with caution)
-python3 bountycatch.py delete-all --confirm
+krazedb delete-all --confirm
 ```
 
 ### Other Usage
 
 #### **Custom Configuration**
 ```bash
-python3 bountycatch.py -c my-config.json -v add -f domains.txt
+krazedb -c my-config.json -v add -f domains.txt
 ```
 
 #### **Batch Operations**
 ```bash
 # Process multiple files
 for file in *.txt; do
-  python3 bountycatch.py add -f "$file"
+  krazedb add -f "$file"
 done
 ```
 
@@ -254,7 +267,7 @@ subdomain.example.org
 
 ### Log Destinations
 - **Console** - Real-time feedback
-- **File** - `bountycatch.log` for persistent logging
+- **File** - `krazedb.log` for persistent logging
 
 ## Error Handling
 

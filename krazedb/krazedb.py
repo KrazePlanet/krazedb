@@ -345,7 +345,7 @@ def setup_logging(config: ConfigManager) -> None:
         format=logging_config['format'],
         handlers=[
             logging.StreamHandler(),
-            logging.FileHandler('bountycatch.log')
+            logging.FileHandler('krazedb.log')
         ]
     )
 
