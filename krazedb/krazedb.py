@@ -7,6 +7,7 @@ import re
 from datetime import datetime
 from typing import Optional, Set, Dict, Any
 from pathlib import Path
+import subprocess
 
 class DataStore:
     def __init__(self, host='localhost', port=6379, db=0, max_connections=10):
@@ -193,13 +194,17 @@ class DomainManager:
             return False
 
     def _process_domain(self, domain: str) -> str:
-        """Process domain to handle special cases while keeping them valid for storage."""
-        # Remove any leading/trailing whitespace
+        """Normalize domain input (similar to sed filters)."""
         domain = domain.strip()
-        
-        # Domain is stored as-is since our validator now accepts these patterns
-        # No sanitization needed - we want to preserve the original format
-        return domain
+
+        # Apply the filters
+        domain = re.sub(r'^\*\.', '', domain)       # remove leading *.
+        domain = re.sub(r'^\*', '', domain)         # remove leading *
+        domain = re.sub(r'^\.', '', domain)         # remove leading .
+        domain = re.sub(r'^https?://', '', domain)  # remove leading http:// or https://
+        domain = re.sub(r'^www\.', '', domain)      # remove leading www.
+
+        return domain.lower()
 
     def add_domains_from_file(self, filename: str, validate: bool = True) -> None:
         file_path = Path(filename)
@@ -375,7 +380,8 @@ Examples:
     export_parser.add_argument('--format', choices=['text', 'json'], default='text', help='Export format')
     
     print_parser = subparsers.add_parser('print', help='Print all domains')
-    
+    print_parser.add_argument('-d', '--domain', help='Filter by base domain (e.g., dell.com)')
+
     count_parser = subparsers.add_parser('count', help='Count domains in database')
     
     remove_parser = subparsers.add_parser('remove', help='Remove domains from database')
@@ -429,8 +435,27 @@ Examples:
         if not domains:
             logger.warning("No domains found in database")
         else:
-            for domain in sorted(domains):
-                print(domain)
+            if args.domain:
+                # filter domains ending with the given base domain
+                filtered = [d for d in sorted(domains) if d.endswith(args.domain)]
+                if not filtered:
+                    logger.warning(f"No subdomains found for {args.domain}")
+                else:
+                    # use tldinfo for formatting
+                    try:
+                        proc = subprocess.run(
+                            ["tldinfo", "--silent", "--extract", "subdomain,domain,suffix"],
+                            input="\n".join(filtered),
+                            text=True,
+                            capture_output=True,
+                            check=True
+                        )
+                        print(proc.stdout.strip())
+                    except subprocess.CalledProcessError as e:
+                        logger.error(f"tldinfo failed: {e.stderr}")
+            else:
+                for domain in sorted(domains):
+                    print(domain)
                 
     elif args.command == 'count':
         count = domain_manager.count_domains()
