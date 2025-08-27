@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Optional, Set, Dict, Any
 from pathlib import Path
 import subprocess
+import gzip
 
 class DataStore:
     def __init__(self, host='localhost', port=6379, db=0, max_connections=10):
@@ -213,7 +214,13 @@ class DomainManager:
             return
         
         try:
-            with open(file_path, 'r') as file:
+            # Open normally or as gzip
+            if file_path.suffix == ".gz":
+                file_opener = lambda f: gzip.open(f, 'rt', encoding='utf-8', errors='ignore')
+            else:
+                file_opener = lambda f: open(f, 'r', encoding='utf-8', errors='ignore')
+
+            with file_opener(file_path) as file:
                 total_domains = 0
                 new_domains = 0
                 invalid_domains = 0
@@ -260,7 +267,13 @@ class DomainManager:
             return
         
         try:
-            with open(file_path, 'r') as file:
+            # Open normally or as gzip
+            if file_path.suffix == ".gz":
+                file_opener = lambda f: gzip.open(f, 'rt', encoding='utf-8', errors='ignore')
+            else:
+                file_opener = lambda f: open(f, 'r', encoding='utf-8', errors='ignore')
+
+            with file_opener(file_path) as file:
                 total_domains = 0
                 removed_domains = 0
                 not_found_domains = 0
@@ -365,7 +378,7 @@ Examples:
   %(prog)s count
   %(prog)s remove -f domains_to_remove.txt
   %(prog)s remove -d example.com
-  %(prog)s delete-all
+  %(prog)s delete
         """
     )
     
@@ -389,8 +402,8 @@ Examples:
     remove_group.add_argument('-f', '--file', help='File containing domains to remove')
     remove_group.add_argument('-d', '--domain', help='Single domain to remove')
     
-    delete_parser = subparsers.add_parser('delete-all', help='Delete all domains')
-    delete_parser.add_argument('--confirm', action='store_true', help='Skip confirmation prompt')
+    delete_parser = subparsers.add_parser('delete', help='Delete all domains')
+    delete_parser.add_argument('-y', '--yes', action='store_true', help='Skip confirmation prompt')
     
     parser.add_argument('-c', '--config', help='Configuration file path')
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose logging')
@@ -473,8 +486,8 @@ Examples:
             else:
                 return 1
             
-    elif args.command == 'delete-all':
-        if not args.confirm:
+    elif args.command == 'delete':
+        if not args.yes:
             response = input("Are you sure you want to delete ALL domains from the database? (y/N): ")
             if response.lower() not in ['y', 'yes']:
                 logger.info("Delete operation cancelled")

@@ -184,10 +184,10 @@ krazedb export -f domains.json --format json
 Remove all domains from the database:
 ```bash
 # With confirmation prompt
-krazedb delete-all
+krazedb delete
 
 # Skip confirmation (use with caution)
-krazedb delete-all --confirm
+krazedb delete --yes
 ```
 
 ### Other Usage
