@@ -242,16 +242,19 @@ class Project:
                 invalid_domains = 0
                 
                 for line_num, line in enumerate(file, 1):
-                    domain = line.strip()
+                    domain = line.strip().strip('\r')
                     if not domain:
                         continue
                     
                     processed_domain = self._process_domain(domain)
-                    
-                    if validate and not DomainValidator.is_valid_domain(processed_domain):
-                        self.logger.warning(f"Invalid domain '{domain}' on line {line_num}, skipping")
-                        invalid_domains += 1
-                        continue
+
+                    if validate:
+                        if not DomainValidator.is_valid_domain(domain):
+                            self.logger.warning(f"Invalid domain '{domain}' on line {line_num}, skipping")
+                            invalid_domains += 1
+                            continue
+                    else:
+                        processed_domain = domain  # save as-is
                     
                     try:
                         added = self.datastore.add_domain(self.name, processed_domain)
@@ -295,7 +298,7 @@ class Project:
                 not_found_domains = 0
                 
                 for line_num, line in enumerate(file, 1):
-                    domain = line.strip()
+                    domain = line.strip().strip('\r')
                     if not domain:
                         continue
                     
