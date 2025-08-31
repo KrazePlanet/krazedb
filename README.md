@@ -104,3 +104,8 @@ krazedb [arguments] -p [projects]
 
 krazedb print -p ppsubs
 ```
+
+```
+krazedb add -p myproject -f domains.txt
+cat domains.txt | krazedb add -p myproject -f -
+```

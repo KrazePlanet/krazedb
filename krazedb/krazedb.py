@@ -9,9 +9,10 @@ from typing import Optional, Set, Dict, Any
 from pathlib import Path
 import subprocess
 import gzip
+import sys
 
 # Define the version
-__version__ = "v0.0.1"  # Current Version of krazedb
+__version__ = "v0.0.2"  # Current Version of krazedb
 
 class DataStore:
     def __init__(self, host='localhost', port=6379, db=0, max_connections=10):
@@ -224,24 +225,27 @@ class Project:
         return domain.lower()
 
     def add_domains_from_file(self, filename: str, validate: bool = True) -> None:
-        file_path = Path(filename)
-        if not file_path.exists():
-            self.logger.error(f"File {filename} does not exist")
-            return
-        
-        try:
+        if filename == "-":  # Read from stdin
+            file_obj = sys.stdin
+            file_path = None
+        else:
+            file_path = Path(filename)
+            if not file_path.exists():
+                self.logger.error(f"File {filename} does not exist")
+                return
             # Open normally or as gzip
             if file_path.suffix == ".gz":
-                file_opener = lambda f: gzip.open(f, 'rt', encoding='utf-8', errors='ignore')
+                file_obj = gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore')
             else:
-                file_opener = lambda f: open(f, 'r', encoding='utf-8', errors='ignore')
+                file_obj = open(file_path, 'r', encoding='utf-8', errors='ignore')
 
-            with file_opener(file_path) as file:
+        try:
+            with file_obj:
                 total_domains = 0
                 new_domains = 0
                 invalid_domains = 0
                 
-                for line_num, line in enumerate(file, 1):
+                for line_num, line in enumerate(file_obj, 1):
                     domain = line.strip().strip('\r')
                     if not domain:
                         continue
@@ -280,24 +284,27 @@ class Project:
 
     def remove_domains_from_file(self, filename: str) -> None:
         """Remove domains listed in a file from the project"""
-        file_path = Path(filename)
-        if not file_path.exists():
-            self.logger.error(f"File {filename} does not exist")
-            return
-        
-        try:
+        if filename == "-":  # Read from stdin
+            file_obj = sys.stdin
+            file_path = None
+        else:
+            file_path = Path(filename)
+            if not file_path.exists():
+                self.logger.error(f"File {filename} does not exist")
+                return
             # Open normally or as gzip
             if file_path.suffix == ".gz":
-                file_opener = lambda f: gzip.open(f, 'rt', encoding='utf-8', errors='ignore')
+                file_obj = gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore')
             else:
-                file_opener = lambda f: open(f, 'r', encoding='utf-8', errors='ignore')
+                file_obj = open(file_path, 'r', encoding='utf-8', errors='ignore')
 
-            with file_opener(file_path) as file:
+        try:
+            with file_obj:
                 total_domains = 0
                 removed_domains = 0
                 not_found_domains = 0
                 
-                for line_num, line in enumerate(file, 1):
+                for line_num, line in enumerate(file_obj, 1):
                     domain = line.strip().strip('\r')
                     if not domain:
                         continue
