@@ -17,36 +17,10 @@ sudo systemctl start redis-server
 sudo systemctl enable redis-server
 ```
 
-#### **Linux (RHEL/CentOS/Fedora)**
-```bash
-sudo dnf install redis
-# or for older systems: sudo yum install redis
-
-# Start Redis service
-sudo systemctl start redis-server
+```
 sudo systemctl enable redis-server
-```
-
-#### **Windows**
-```powershell
-# Using Chocolatey
-choco install redis-64
-
-# Or download from: https://github.com/microsoftarchive/redis/releases
-# Then run: redis-server.exe
-```
-
-#### **macOS**
-```bash
-brew install redis
-brew services start redis
-```
-
-### Python Dependencies
-```bash
-pip install redis
-# or
-pip install -r requirements.txt
+sudo systemctl start redis-server
+systemctl status redis-server
 ```
 
 ## Configuration
