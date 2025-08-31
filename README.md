@@ -79,7 +79,7 @@ export REDIS_PORT=6380
 
 ### Installing krazedb
 ```
-git clone https://github.com/rix4uni/krazedb.git
+git clone https://github.com/KrazePlanet/krazedb.git
 cd krazedb
 python3 setup.py install
 ```
@@ -87,7 +87,7 @@ python3 setup.py install
 ## pipx
 Quick setup in isolated python environment using [pipx](https://pypa.github.io/pipx/)
 ```
-pipx install --force git+https://github.com/rix4uni/krazedb.git
+pipx install --force git+https://github.com/KrazePlanet/krazedb.git
 ```
 
 ## Usage
