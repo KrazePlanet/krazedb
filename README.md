@@ -123,3 +123,10 @@ Examples:
   krazedb remove -p myproject -d example.com
   krazedb delete -p myproject
 ```
+
+## Usage Examples
+```
+krazedb [arguments] -p [projects]
+
+krazedb print -p ppsubs
+```
